@@ -15,7 +15,7 @@ interface NewsItem {
   company: string;
   headline: string;
   content: string;
-  sentiment?: string;
+  recommendation?: string;
 }
 
 async function fetchNews() {
@@ -54,12 +54,12 @@ export default function NewsFeed() {
               if (data.error) {
                 throw new Error(data.error);
               }
-              return { ...item, sentiment: data.sentiment };
+              return { ...item, recommendation: data.recommendation };
             } catch (error) {
-              console.error("Error analyzing sentiment:", error);
+              console.error("Error analyzing recommendation:", error);
               return {
                 ...item,
-                sentiment:
+                recommendation:
                   "Error: " +
                   (error instanceof Error ? error.message : String(error)),
               };
@@ -99,22 +99,20 @@ export default function NewsFeed() {
           <CardContent>
             <p className="mb-2">{item.content}</p>
             <p className="font-bold">
-              Sentiment:
+              Recommendation:
               <span
                 className={
-                  item.sentiment?.startsWith("Error")
+                  item.recommendation?.startsWith("Error")
                     ? "text-red-500"
-                    : item.sentiment === "Positive"
+                    : item.recommendation === "BUY"
                     ? "text-green-500"
-                    : item.sentiment === "Negative"
+                    : item.recommendation === "SELL"
                     ? "text-red-500"
-                    : item.sentiment === "Neutral"
-                    ? "text-yellow-500"
-                    : "text-gray-500"
+                    : "text-yellow-500"
                 }
               >
                 {" "}
-                {item.sentiment}
+                {item.recommendation}
               </span>
             </p>
           </CardContent>

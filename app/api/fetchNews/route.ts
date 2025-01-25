@@ -29,7 +29,7 @@ async function fetchTopHeadlines() {
 
     const data = await response.json();
 
-    return data.articles.slice(0, 5).map((article: any, index: number) => ({
+    return data.articles.slice(0, 10).map((article: any, index: number) => ({
       id: index + 1,
       company: article.source.name || "Business News",
       headline: article.title,
@@ -38,43 +38,7 @@ async function fetchTopHeadlines() {
   } catch (error) {
     console.error("Error fetching news:", error);
     // Return dummy data in case of error
-    return [
-      {
-        id: 1,
-        company: "Apple",
-        headline: "Apple's AI Strategy Revealed",
-        content:
-          "Apple unveils its comprehensive artificial intelligence strategy, including new AI features for iOS and macOS.",
-      },
-      {
-        id: 2,
-        company: "Tesla",
-        headline: "Tesla's New Battery Technology",
-        content:
-          "Tesla announces breakthrough in battery technology, promising 500 miles range and faster charging.",
-      },
-      {
-        id: 3,
-        company: "Microsoft",
-        headline: "Microsoft's Cloud Revenue Soars",
-        content:
-          "Microsoft reports record-breaking cloud services revenue, exceeding market expectations.",
-      },
-      {
-        id: 4,
-        company: "Google",
-        headline: "Google's Quantum Computing Milestone",
-        content:
-          "Google achieves quantum supremacy with its latest quantum computing breakthrough.",
-      },
-      {
-        id: 5,
-        company: "Meta",
-        headline: "Meta's Revolutionary AR Glasses",
-        content:
-          "Meta launches next-generation AR glasses with advanced neural interface capabilities.",
-      },
-    ];
+    return [];
   }
 }
 

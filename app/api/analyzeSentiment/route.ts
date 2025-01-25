@@ -1,58 +1,47 @@
 import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
-const GROQ_API_KEY = process.env.GROQ_API_KEY;
+// Initialize Gemini AI
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
 
-if (!GROQ_API_KEY) {
-  throw new Error("GROQ_API_KEY is not set in the environment variables");
-}
-
-export async function POST(request: NextRequest) {
+export async function POST(request: Request) {
   try {
     const { text } = await request.json();
 
     if (!text) {
-      throw new Error("No text provided for sentiment analysis");
+      return NextResponse.json(
+        { error: "No text provided for analysis" },
+        { status: 400 }
+      );
     }
 
-    const response = await fetch(
-      "https://api.groq.com/openai/v1/chat/completions",
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${GROQ_API_KEY}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          model: "mixtral-8x7b-32768",
-          messages: [
-            {
-              role: "system",
-              content:
-                "You are a sentiment analysis AI. Analyze the sentiment of the given text and tell me if i should buy, sell, or hold the stock.",
-            },
-            {
-              role: "user",
-              content: text,
-            },
-          ],
-          max_tokens: 1,
-        }),
-      }
-    );
+    // Initialize the model
+    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 
-    if (!response.ok) {
-      throw new Error(`Groq API request failed with status ${response.status}`);
+    // Create the prompt for stock recommendation
+    const prompt = `Based on this news article, provide a one-word stock recommendation: either "BUY", "SELL", or "HOLD". Consider the market impact and sentiment. Here's the text: "${text}"`;
+
+    // Generate content
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    const recommendation = response.text().trim().toUpperCase();
+
+    // Validate the response
+    if (!["BUY", "SELL", "HOLD"].includes(recommendation)) {
+      return NextResponse.json({
+        recommendation: "HOLD",
+        note: "Defaulting to HOLD due to unclear analysis",
+      });
     }
 
-    const data = await response.json();
-    const sentiment = data.choices[0].message.content.trim();
-
-    return NextResponse.json({ sentiment });
+    return NextResponse.json({ recommendation });
   } catch (error) {
-    console.error("Sentiment analysis error:", error);
+    console.error("Error analyzing stock recommendation:", error);
     return NextResponse.json(
-      { error: "Failed to analyze sentiment", details: error.message },
+      {
+        error: "Failed to analyze stock recommendation",
+        details: error instanceof Error ? error.message : String(error),
+      },
       { status: 500 }
     );
   }
