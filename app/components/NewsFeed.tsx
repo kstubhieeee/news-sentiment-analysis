@@ -9,6 +9,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
 
 interface NewsItem {
   id: number;
@@ -89,32 +90,32 @@ export default function NewsFeed() {
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {news.map((item) => (
-        <Card key={item.id}>
+        <Card key={item.id} className="transition-all hover:shadow-lg">
           <CardHeader>
-            <CardTitle>{item.company}</CardTitle>
-            <CardDescription>{item.headline}</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <p className="mb-2">{item.content}</p>
-            <p className="font-bold">
-              Recommendation:
-              <span
+            <div className="flex items-center justify-between mb-2">
+              <Badge variant="outline">{item.company}</Badge>
+              <Badge
                 className={
                   item.recommendation?.startsWith("Error")
-                    ? "text-red-500"
+                    ? "bg-destructive"
                     : item.recommendation === "BUY"
-                    ? "text-green-500"
+                    ? "bg-green-500"
                     : item.recommendation === "SELL"
-                    ? "text-red-500"
-                    : "text-yellow-500"
+                    ? "bg-red-500"
+                    : "bg-yellow-500"
                 }
               >
-                {" "}
                 {item.recommendation}
-              </span>
-            </p>
+              </Badge>
+            </div>
+            <CardTitle className="text-lg line-clamp-2">{item.headline}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <CardDescription className="line-clamp-3">
+              {item.content}
+            </CardDescription>
           </CardContent>
         </Card>
       ))}
